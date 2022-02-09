@@ -102,7 +102,8 @@ def _depthFirstSearch(problem: SearchProblem, currentPos: tuple, parentNode: tup
     
     # Se o nó atual for o objetivo, não há porque continuar a busca
     if(problem.isGoalState(currentPos)):
-        return True, ""
+        isGoalFound = True
+        return isGoalFound, ""
 
     # Marca o nó atual como visitado para evitar loops infinitos
     visited_nodes.append(currentPos)
