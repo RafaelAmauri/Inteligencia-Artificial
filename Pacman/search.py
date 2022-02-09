@@ -82,51 +82,82 @@ def depthFirstSearch(problem: SearchProblem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
     """
-
-    #print("Start:", problem.getStartState())
-    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-
-    "*** YOUR CODE HERE ***"
     
-    currentPos = problem.getStartState()
-
-    # MUDAR O NOME DESSA FUNCAO
-    solution = (dfs_pirata(problem, currentPos, (-1, -1), [], False))[1].split(" ")
+    """
+    Código por Rafael Amauri Diniz Augusto - 651047
+    """
+    solution = _depthFirstSearch(problem, problem.getStartState(), (-1, -1), [], False)[1].split(" ")
 
     return solution
     
-    #util.raiseNotDefined()
 
-def dfs_pirata(problem: SearchProblem, currentPos: tuple, parentNode: tuple, visited_nodes:list , isFound: bool):
+# Uma função separada é necessária por causa das várias chamadas de recursão
+def _depthFirstSearch(problem: SearchProblem, currentPos: tuple, parentNode: tuple, visited_nodes:list , isGoalFound: bool):
+    
+    # Se o nó atual for o objetivo, não há porque continuar a busca
     if(problem.isGoalState(currentPos)):
         return True, ""
 
+    # Marca o nó atual como visitado para evitar loops infinitos
     visited_nodes.append(currentPos)
     neighborNodes = problem.getSuccessors(currentPos)
     
-    isFound = False
+    isGoalFound = False
     solution = ""
     direction = ""
 
+    # Abre uma recursão para cada nó que não é o nó pai, que não foi visitado e se o objetivo ainda não foi encontrado.
     for i in neighborNodes:
-        if (i[0] != parentNode) and (i[0] not in visited_nodes and not isFound):
+        if (i[0] != parentNode) and (i[0] not in visited_nodes and not isGoalFound):
+            # Literalmente a direção. Cada i aparece como "((3, 1), 'West', 1)" por exemplo.
             direction = i[1]
-            isFound, solution = dfs_pirata(problem, i[0], currentPos, visited_nodes, isFound)
+
+            # Aqui é onde a recursão é aberta para cada nó que é válido nos critérios acima
+            isGoalFound, solution = _depthFirstSearch(problem, i[0], currentPos, visited_nodes, isGoalFound)
             
+            # Isso aqui é feito porque quando o objetivo é achado na recursão, ele retorna um "", e isso ferra no final quando 
+            # for feito um split na string. Infelizmente NÃO tem como tirar!!
             if(solution == ""):
                 solution = f"{direction}"
             else:
                 solution = f"{direction} {solution}"
 
-    return isFound, f"{solution}"
+    return isGoalFound, f"{solution}"
 
 
+# TODO: BFS
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+
+    currentPos = problem.getStartState()
+
     util.raiseNotDefined()
+
+
+def bfs_pirata(problem: SearchProblem):
+    
+    neighborNodes = problem.getSuccessors(currentPos)
+    priorityQueue = []
+    isGoalFound = False
+
+    for i in neighborNodes:
+        priorityQueue.append(i)
+
+    while not priorityQueue and not isGoalFound:
+        for i in priorityQueue:
+            currentPos = i[0]
+            
+            if problem.isGoalState(currentPos):
+                isGoalFound = True
+            
+    pass
 
 
 def uniformCostSearch(problem: SearchProblem):
