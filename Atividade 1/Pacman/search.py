@@ -110,9 +110,9 @@ def _depthFirstSearch(problem: SearchProblem, currentPos: tuple, parentNode: tup
     solution = ""
     direction = ""
 
-    # Abre uma recursão para cada nó que não é o nó pai, que não foi visitado e se o objetivo ainda não foi encontrado.
+    # Abre uma recursão da função para cada nó que não foi visitado e se o objetivo ainda não foi encontrado.
     for i in neighbor_nodes:
-        if (i[0] != parentNode) and (i[0] not in visited_nodes and not isGoalFound):
+        if (i[0] not in visited_nodes) and (not isGoalFound):
             # Literalmente a direção. Cada i aparece como "((3, 1), 'West', 1)" por exemplo.
             direction = i[1]
 
@@ -187,28 +187,36 @@ def breadthFirstSearch(problem: SearchProblem):
     # Para saber o caminho, o melhor jeito é usar nosso dicionário que armazena o nó pai de outro nó.
     # Essa estratégia é boa no BFS porque pelo funcionamento do algoritmo, navegar pelos nó-pai vai sempre 
     # nos dar a menor distância entre dois nós. No DFS isso já não funcionaria, por exemplo.
-    path = []
+    solution = []
     child_node  = currentPos
     parent_node = parent[child_node]
 
     # Aqui eu começo no nó que é o final do labirinto e vou navegando de nó-filho para nó-pai até chegar onde era o ponto inicial. 
-    # Assim eu consigo pegar as direções e armazeno elas na variável path
+    # Assim eu consigo pegar as direções e armazeno elas na variável solution
     while child_node != problem.getStartState():
         for neighbor, direction, cost in problem.getSuccessors(parent_node):
             if neighbor == child_node:
-                path.insert(0, direction)
+                solution.insert(0, direction)
                 child_node  = parent_node
                 parent_node = parent[parent_node]
                 break
 
 
-    return path
+    return solution
+
 
 # TODO UCS
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    currentPos = problem.getStartState()
+    
+    neighbor_nodes = problem.getSuccessors(currentPos)
+
+    print(neighbor_nodes[0][2])
+
     util.raiseNotDefined()
+
 
 
 # TODO
