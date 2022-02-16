@@ -90,7 +90,7 @@ def depthFirstSearch(problem: SearchProblem):
     """
     
     solution = _depthFirstSearch(problem, problem.getStartState(), (-1, -1), [], False)[1].split(" ")
-    print(solution)
+    
     return solution
 
 
@@ -120,7 +120,7 @@ def _depthFirstSearch(problem: SearchProblem, currentPos: tuple, parentNode: tup
             isGoalFound, solution = _depthFirstSearch(problem, i[0], currentPos, visited_nodes, isGoalFound)
             
             # Isso aqui é feito porque quando o objetivo é achado na recursão, ele retorna um "", e isso ferra no final quando 
-            # for feito um split na string. Infelizmente NÃO tem como tirar!!
+            # for feito um split na string. Infelizmente NÃO TEM como fazer de outro jeito!!
             if(solution == ""):
                 solution = f"{direction}"
             else:
@@ -137,7 +137,7 @@ def breadthFirstSearch(problem: SearchProblem):
     # Marca o nó inicial como visitado
     visited_nodes  =  []
 
-    queue          =  []
+    queue          =  util.Queue()
     
     # Esse cara aqui armazena em um dicionário qual nó é o pai de um determinado nó.
     # Por exemplo: parent[4,5] = (5,5) no layout tiny maze.
@@ -157,32 +157,31 @@ def breadthFirstSearch(problem: SearchProblem):
 
     # Populando a queue para simplificar o laço while abaixo
     for i in neighbor_nodes:
-        queue.append(i)
+        queue.push(i)
         parent[i[0]] = currentPos
     
     while queue and not isGoalFound:
-        for i in queue:
-            currentPos = i[0]
-            visited_nodes.append(currentPos)
-            
-            # Se a posição atual for o objetivo
-            if problem.isGoalState(currentPos):
-                isGoalFound = True
-                break
+        currentPos = queue.pop()[0]
+        visited_nodes.append(currentPos)
+        
+        # Se a posição atual for o objetivo
+        if problem.isGoalState(currentPos):
+            isGoalFound = True
+            break
 
-            # Se não for, pegar os vizinhos do nó atual, adicionar os não-visitados
-            # na queue e continuar o laço while.
-            neighbor_nodes = problem.getSuccessors(currentPos)
-            
-            for i in neighbor_nodes:
-                is_in_visited_nodes = False
-                for j in visited_nodes:
-                    if i[0] == j:
-                        is_in_visited_nodes = True
+        # Se não for, pegar os vizinhos do nó atual, adicionar os não-visitados
+        # na queue e continuar o laço while.
+        neighbor_nodes = problem.getSuccessors(currentPos)
+        
+        for i in neighbor_nodes:
+            is_in_visited_nodes = False
+            for j in visited_nodes:
+                if i[0] == j:
+                    is_in_visited_nodes = True
 
-                if not is_in_visited_nodes:
-                    queue.append(i)
-                    parent[i[0]] = currentPos
+            if not is_in_visited_nodes:
+                queue.push(i)
+                parent[i[0]] = currentPos
     
 
     # Para saber o caminho, o melhor jeito é usar nosso dicionário que armazena o nó pai de outro nó.
@@ -202,9 +201,8 @@ def breadthFirstSearch(problem: SearchProblem):
                 parent_node = parent[parent_node]
                 break
 
-    print(parent)
-    return path
 
+    return path
 
 # TODO UCS
 def uniformCostSearch(problem: SearchProblem):
