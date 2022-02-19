@@ -291,8 +291,112 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     # Copiar e colar o UCS, so que somando a heuristica junto com o step_cost
     current_pos = problem.getStartState()
 
+    visited_nodes    =  []
+    queue            =  util.Queue()
 
-    util.raiseNotDefined()
+    # Armazena quem são os vizinhos de um determinado nó N
+    neighbor_nodes   =  []
+
+    is_goal_found    =  False    
+    neighbor_nodes   =  problem.getSuccessors(current_pos)
+
+    # Marca o nó inicial como visitado
+    visited_nodes.append(current_pos)
+
+    # Populando a queue para simplificar o laço while abaixo
+    for i in neighbor_nodes:
+        queue.push(i)
+    
+    while queue and not is_goal_found:
+        current_pos = queue.pop()[0]
+        visited_nodes.append(current_pos)
+        
+        # Se a posição atual for o objetivo
+        if problem.isGoalState(current_pos):
+            goal_pos = current_pos
+            is_goal_found = True
+            break
+
+        # Se não for, pegar os vizinhos do nó atual, adicionar os não-visitados
+        # na queue e continuar o laço while.
+        neighbor_nodes = problem.getSuccessors(current_pos)
+        
+        for i in neighbor_nodes:
+            is_in_visited_nodes = False
+            for j in visited_nodes:
+                if i[0] == j:
+                    is_in_visited_nodes = True
+
+            if not is_in_visited_nodes:
+                queue.push(i)
+
+    # Esse cara aqui armazena em um dicionário qual nó é o pai de um determinado nó.
+    # Por exemplo: parent[4,5] = (5,5) no layout tiny maze.
+    parent           =  {}
+
+    neighbor_nodes   =  []
+
+    visited_nodes    =  []
+
+    # Items com prioridade maior ficam mais no final! Items com prioridade menos aparecem nas primeiras posições
+    # (Priority, Number of Insertion, Item)
+    p_queue        =  util.PriorityQueue()
+
+    current_pos = problem.getStartState()
+
+    # Marca o nó inicial como visitado
+    visited_nodes.append(current_pos)
+
+    # Como o nó inicial não tem pai, o nó pai dele é ele mesmo, e obviamente, com custo zero
+    parent[ problem.getStartState() ] = [ problem.getStartState() , 0]
+
+    # Pega os nós vizinhos
+    neighbor_nodes = problem.getSuccessors(current_pos)
+
+    is_goal_found = False
+
+    while not is_goal_found:
+        if problem.isGoalState(current_pos):
+            is_goal_found = True
+            break
+
+        neighbor_nodes = problem.getSuccessors(current_pos)
+        visited_nodes.append(current_pos)
+        
+
+        for position, direction, step_cost in neighbor_nodes:
+            previous_cost = parent[current_pos][1]
+
+            is_in_visited_nodes = False
+            for j in visited_nodes:
+                if position == j:
+                    is_in_visited_nodes = True
+
+            if not is_in_visited_nodes:
+                # push(position, priority)
+                # priority = step_cost do nó atual + custo total do caminho até o nó <position>
+                p_queue.push(position, step_cost + previous_cost + util.manhattanDistance(current_pos, goal_pos))
+                parent[ position ] = [ current_pos, step_cost + previous_cost + util.manhattanDistance(current_pos, goal_pos) ]
+
+        current_pos = p_queue.pop()
+
+    # Para saber o caminho, o melhor jeito de novo é usar nosso dicionário que armazena o nó pai de outro nó.
+    # Dessa forma, vamos seguir precisamente o caminho que o UCS acima percorreu pra achar o goalState
+    solution     =  []
+    child_node   =  current_pos
+    parent_node  =  parent[child_node][0]
+    
+    # Aqui eu começo no nó que é o final do labirinto e vou navegando de nó-filho para nó-pai até chegar onde era o ponto inicial. 
+    # Assim eu consigo pegar as direções e armazeno elas na variável solution
+    while child_node != problem.getStartState():
+        for neighbor, direction, cost in problem.getSuccessors(parent_node):
+            if neighbor == child_node:
+                solution.insert(0, direction)
+                child_node  = parent_node
+                parent_node = parent[parent_node][0]
+                break
+    
+    return solution
 
 
 # Abbreviations
