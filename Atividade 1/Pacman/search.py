@@ -73,6 +73,7 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
     
+    
 def depthFirstSearch(problem: SearchProblem):
     """
     Search the deepest nodes in the search tree first.
@@ -89,44 +90,75 @@ def depthFirstSearch(problem: SearchProblem):
 
     """
     
-    solution = _depthFirstSearch(problem, problem.getStartState(), (-1, -1), [], False)[1].split(" ")
-    
-    return solution
+    # Sempre começa no nó inicial
+    current_pos      =  problem.getStartState()
 
+    visited_nodes    =  []
+    stack            =  util.Stack()
 
-# Uma função separada é necessária por causa das várias chamadas de recursão
-def _depthFirstSearch(problem: SearchProblem, current_pos: tuple, parentNode: tuple, visited_nodes:list , is_goal_found: bool):
-    
-    # Se o nó atual for o objetivo, não há porque continuar a busca
-    if(problem.isGoalState(current_pos)):
-        is_goal_found = True
-        return is_goal_found, ""
+    # Esse cara aqui armazena em um dicionário qual nó é o pai de um determinado nó.
+    # Por exemplo: parent[4,5] = (5,5) no layout tiny maze.
+    parent           =  {}
 
-    # Marca o nó atual como visitado para evitar loops infinitos
+    # Armazena quem são os vizinhos de um determinado nó N
+    neighbor_nodes   =  []
+
+    is_goal_found    =  False    
+    neighbor_nodes   =  problem.getSuccessors(current_pos)
+
+    # Marca o nó inicial como visitado
     visited_nodes.append(current_pos)
-    neighbor_nodes = problem.getSuccessors(current_pos)
-    
-    is_goal_found  =  False
-    solution       =  ""
-    direction      =  ""
 
-    # Abre uma recursão da função para cada nó que não foi visitado e se o objetivo ainda não foi encontrado.
+    # Como o nó inicial não tem pai, o nó pai dele é ele mesmo :P
+    parent[ problem.getStartState() ] = problem.getStartState()
+
+    # Populando a queue para simplificar o laço while abaixo
     for i in neighbor_nodes:
-        if ( i[0] not in visited_nodes ) and ( not is_goal_found ):
-            # Literalmente a direção. Cada i aparece como "((3, 1), 'West', 1)" por exemplo.
-            direction = i[1]
+        stack.push(i)
+        parent[ i[0] ] = current_pos
+    
+    while stack and not is_goal_found:
+        current_pos = stack.pop()[0]
+        visited_nodes.append(current_pos)
+        
+        # Se a posição atual for o objetivo
+        if problem.isGoalState(current_pos):
+            is_goal_found = True
+            break
 
-            # Aqui é onde a recursão é aberta para cada nó que é válido nos critérios acima
-            is_goal_found, solution = _depthFirstSearch(problem, i[0], current_pos, visited_nodes, is_goal_found)
-            
-            # Isso aqui é feito porque quando o objetivo é achado na recursão, ele retorna um "", e isso ferra no final quando 
-            # for feito um split na string. Infelizmente NÃO TEM como fazer de outro jeito!!
-            if(solution == ""):
-                solution = f"{direction}"
-            else:
-                solution = f"{direction} {solution}"
+        # Se não for, pegar os vizinhos do nó atual, adicionar os não-visitados
+        # na queue e continuar o laço while.
+        neighbor_nodes = problem.getSuccessors(current_pos)
+        
+        for i in neighbor_nodes:
+            is_in_visited_nodes = False
+            for j in visited_nodes:
+                if i[0] == j:
+                    is_in_visited_nodes = True
 
-    return is_goal_found, f"{solution}"
+            if not is_in_visited_nodes:
+                stack.push(i)
+                parent[ i[0] ] = current_pos
+    
+
+    # Para saber o caminho, o melhor jeito é usar nosso dicionário que armazena o nó pai de outro nó.
+    # Essa estratégia é boa no BFS porque pelo funcionamento do algoritmo, navegar pelos nó-pai vai sempre 
+    # nos dar a menor distância entre dois nós. No DFS isso já não funcionaria, por exemplo.
+    solution     =  []
+    child_node   =  current_pos
+    parent_node  =  parent[child_node]
+
+    # Aqui eu começo no nó que é o final do labirinto e vou navegando de nó-filho para nó-pai até chegar onde era o ponto inicial. 
+    # Assim eu consigo pegar as direções e armazeno elas na variável solution
+    while child_node != problem.getStartState():
+        for neighbor, direction, cost in problem.getSuccessors(parent_node):
+            if neighbor == child_node:
+                solution.insert(0, direction)
+                child_node  = parent_node
+                parent_node = parent[parent_node]
+                break
+
+    return solution
 
 
 def breadthFirstSearch(problem: SearchProblem):
