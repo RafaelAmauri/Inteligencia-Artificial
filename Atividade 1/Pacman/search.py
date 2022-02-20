@@ -271,7 +271,6 @@ def uniformCostSearch(problem: SearchProblem):
 
 
 
-# TODO
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -282,79 +281,36 @@ def nullHeuristic(state, problem=None):
 
 # TODO
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
+
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    # No video do computerphile, isso aqui vai ser literalmente o UCS, so que somando o valor da heuristica ao step_cost
-    # Mas, pra fazer a heuristica, eu tenho que saber a posicao do final :P
-
-    # 0 Achar o goal com o BFS
-    # Copiar e colar o UCS, so que somando a heuristica junto com o step_cost
-    current_pos = problem.getStartState()
-
-    visited_nodes    =  []
-    queue            =  util.Queue()
-
-    # Armazena quem são os vizinhos de um determinado nó N
-    neighbor_nodes   =  []
-
-    is_goal_found    =  False    
-    neighbor_nodes   =  problem.getSuccessors(current_pos)
-
-    # Marca o nó inicial como visitado
-    visited_nodes.append(current_pos)
-
-    # Populando a queue para simplificar o laço while abaixo
-    for i in neighbor_nodes:
-        queue.push(i)
     
-    while queue and not is_goal_found:
-        current_pos = queue.pop()[0]
-        visited_nodes.append(current_pos)
-        
-        # Se a posição atual for o objetivo
-        if problem.isGoalState(current_pos):
-            goal_pos = current_pos
-            is_goal_found = True
-            break
+    # O código do A* é literalmente a mesma coisa que o UCS, só que ele soma o valor da heurística junto ao step_cost
+    # e ao custo acumulado do caminho na p_queue. Por isso eu só copiei e colei meu código do UCS, e quando eu faço um push
+    # pra p_queue, eu somo junto o valor da heurística.
 
-        # Se não for, pegar os vizinhos do nó atual, adicionar os não-visitados
-        # na queue e continuar o laço while.
-        neighbor_nodes = problem.getSuccessors(current_pos)
-        
-        for i in neighbor_nodes:
-            is_in_visited_nodes = False
-            for j in visited_nodes:
-                if i[0] == j:
-                    is_in_visited_nodes = True
+    current_pos    =  problem.getStartState()
+    visited_nodes  =  []
 
-            if not is_in_visited_nodes:
-                queue.push(i)
-
-    # Esse cara aqui armazena em um dicionário qual nó é o pai de um determinado nó.
-    # Por exemplo: parent[4,5] = (5,5) no layout tiny maze.
-    parent           =  {}
-
-    neighbor_nodes   =  []
-
-    visited_nodes    =  []
+    # Tem o mesmo propósito que o <parent> do BFS, mas aqui ele armazena um segundo valor: o gasto total para chegar
+    # em um nó N a partir do nó inicial
+    parent         =  {}
 
     # Items com prioridade maior ficam mais no final! Items com prioridade menos aparecem nas primeiras posições
     # (Priority, Number of Insertion, Item)
     p_queue        =  util.PriorityQueue()
 
-    current_pos = problem.getStartState()
+    is_goal_found  =  False
 
     # Marca o nó inicial como visitado
     visited_nodes.append(current_pos)
 
     # Como o nó inicial não tem pai, o nó pai dele é ele mesmo, e obviamente, com custo zero
-    parent[ problem.getStartState() ] = [ problem.getStartState() , 0]
+    parent[ problem.getStartState() ] = [ problem.getStartState(), 0 ]
 
     # Pega os nós vizinhos
     neighbor_nodes = problem.getSuccessors(current_pos)
-
-    is_goal_found = False
-
+    
     while not is_goal_found:
         if problem.isGoalState(current_pos):
             is_goal_found = True
@@ -375,8 +331,8 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             if not is_in_visited_nodes:
                 # push(position, priority)
                 # priority = step_cost do nó atual + custo total do caminho até o nó <position>
-                p_queue.push(position, step_cost + previous_cost + util.manhattanDistance(current_pos, goal_pos))
-                parent[ position ] = [ current_pos, step_cost + previous_cost + util.manhattanDistance(current_pos, goal_pos) ]
+                p_queue.push(position, step_cost + previous_cost + heuristic(current_pos, problem))
+                parent[ position ] = [ current_pos, step_cost + previous_cost + heuristic(current_pos, problem) ]
 
         current_pos = p_queue.pop()
 
@@ -384,7 +340,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     # Dessa forma, vamos seguir precisamente o caminho que o UCS acima percorreu pra achar o goalState
     solution     =  []
     child_node   =  current_pos
-    parent_node  =  parent[child_node][0]
+    parent_node  =  parent[child_node][0]    
     
     # Aqui eu começo no nó que é o final do labirinto e vou navegando de nó-filho para nó-pai até chegar onde era o ponto inicial. 
     # Assim eu consigo pegar as direções e armazeno elas na variável solution
@@ -398,6 +354,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     
     return solution
 
+    
 
 # Abbreviations
 bfs = breadthFirstSearch
