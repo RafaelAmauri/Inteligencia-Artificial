@@ -139,8 +139,7 @@ def depthFirstSearch(problem: SearchProblem):
             if not is_in_visited_nodes:
                 stack.push(i)
                 parent[ i[0] ] = current_pos
-    
-
+                
     # Para saber o caminho, o melhor jeito é usar nosso dicionário que armazena o nó pai de outro nó.
     # Essa estratégia é boa no BFS porque pelo funcionamento do algoritmo, navegar pelos nó-pai vai sempre 
     # nos dar a menor distância entre dois nós. No DFS isso já não funcionaria, por exemplo.
@@ -311,7 +310,6 @@ def nullHeuristic(state, problem=None):
     return 0
 
 
-# TODO
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
 
     """Search the node that has the lowest combined cost and heuristic first."""
