@@ -1,0 +1,5 @@
+∨ - Or
+¬ - Not
+∧ - And
+→ - If
+⟷ - Equivalencia
