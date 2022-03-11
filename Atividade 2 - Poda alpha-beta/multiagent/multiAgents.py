@@ -137,7 +137,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        print(gameState.getLegalActions())
+        print(gameState.generateSuccessor(3, 'West'))
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
