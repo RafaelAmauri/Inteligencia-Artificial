@@ -45,9 +45,15 @@ class ExactInference(object):
     ##################################################################################
 
     def observe(self, agentX, agentY, observedDist):
-        # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)        
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+        
+        for row in range(self.belief.numRows):
+            for col in range(self.belief.numCols):
+                dist        =  math.sqrt((util.colToX(col) - agentX) ** 2 + (util.rowToY(row) - agentY) ** 2)
+                prob_distr  =  util.pdf(dist, Const.SONAR_STD, observedDist)
+                
+                self.belief.setProb(row, col, self.belief.getProb(row, col) * prob_distr)
+
+        self.belief.normalize()
 
     ##################################################################################
     # Problem 3:
@@ -69,9 +75,16 @@ class ExactInference(object):
     ##################################################################################
     def elapseTime(self):
         if self.skipElapse: return ### ONLY FOR THE GRADER TO USE IN Problem 2
-        # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+
+        newBelief = util.Belief(self.belief.numRows, self.belief.numCols, value=0)
+
+        for oldTile, newTile in self.transProb:
+            newBelief.addProb(newTile[0], newTile[1], self.belief.getProb(*oldTile) * self.transProb[(oldTile, newTile)])
+        
+        newBelief.normalize()
+        
+        self.belief = newBelief
+
 
     # Function: Get Belief
     # ---------------------
@@ -164,9 +177,21 @@ class ParticleFilter(object):
     #   particle.  See util.py for the definition of weightedRandomChoice().
     ##################################################################################
     def observe(self, agentX, agentY, observedDist):
-        # BEGIN_YOUR_CODE (our solution is 10 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+
+        proposed = collections.defaultdict(float)
+
+        for row, col in self.particles:
+            dist        =  math.sqrt((util.colToX(col) - agentX) ** 2 + (util.rowToY(row) - agentY) ** 2)
+            prob_distr  =  util.pdf(dist, Const.SONAR_STD, observedDist)
+            proposed[(row, col)] = self.particles[(row, col)] * prob_distr
+
+        newParticles = collections.defaultdict(int)
+
+        for i in range(self.NUM_PARTICLES):
+            particle = util.weightedRandomChoice(proposed)
+            newParticles[particle] += 1
+
+        self.particles = newParticles
 
         self.updateBelief()
 
@@ -194,9 +219,16 @@ class ParticleFilter(object):
     # - You should NOT call self.updateBelief() at the end of this function.
     ##################################################################################
     def elapseTime(self):
-        # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+        
+        newParticles = collections.defaultdict(int)
+        for tile, value in self.particles.items():
+            if tile in self.transProbDict:
+                for _ in range(value):
+                    newWeightDict = self.transProbDict[tile]
+                    particle = util.weightedRandomChoice(newWeightDict)
+                    newParticles[particle] += 1
+        self.particles = newParticles
+        self.updateBelief()
 
     # Function: Get Belief
     # ---------------------
