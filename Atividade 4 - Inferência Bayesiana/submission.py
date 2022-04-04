@@ -46,12 +46,12 @@ class ExactInference(object):
 
     def observe(self, agentX, agentY, observedDist):
         
-        for row in range(self.belief.numRows):
+        for linha in range(self.belief.numRows):
             for col in range(self.belief.numCols):
-                dist        =  math.sqrt((util.colToX(col) - agentX) ** 2 + (util.rowToY(row) - agentY) ** 2)
-                prob_distr  =  util.pdf(dist, Const.SONAR_STD, observedDist)
+                dist       =  math.sqrt((util.colToX(col) - agentX) ** 2 + (util.rowToY(linha) - agentY) ** 2)
+                dist_prov  =  util.pdf(dist, Const.SONAR_STD, observedDist)
                 
-                self.belief.setProb(row, col, self.belief.getProb(row, col) * prob_distr)
+                self.belief.setProb(linha, col, self.belief.getProb(linha, col) * dist_prov)
 
         self.belief.normalize()
 
@@ -76,14 +76,14 @@ class ExactInference(object):
     def elapseTime(self):
         if self.skipElapse: return ### ONLY FOR THE GRADER TO USE IN Problem 2
 
-        newBelief = util.Belief(self.belief.numRows, self.belief.numCols, value=0)
+        nova_crenca = util.Belief(self.belief.numRows, self.belief.numCols, value=0)
 
-        for oldTile, newTile in self.transProb:
-            newBelief.addProb(newTile[0], newTile[1], self.belief.getProb(*oldTile) * self.transProb[(oldTile, newTile)])
+        for pos_antes, pos_nova in self.transProb:
+            nova_crenca.addProb(pos_nova[0], pos_nova[1], self.belief.getProb(*pos_antes) * self.transProb[(pos_antes, pos_nova)])
         
-        newBelief.normalize()
+        nova_crenca.normalize()
         
-        self.belief = newBelief
+        self.belief = nova_crenca
 
 
     # Function: Get Belief
@@ -178,17 +178,17 @@ class ParticleFilter(object):
     ##################################################################################
     def observe(self, agentX, agentY, observedDist):
 
-        proposed = collections.defaultdict(float)
-
-        for row, col in self.particles:
-            dist        =  math.sqrt((util.colToX(col) - agentX) ** 2 + (util.rowToY(row) - agentY) ** 2)
-            prob_distr  =  util.pdf(dist, Const.SONAR_STD, observedDist)
-            proposed[(row, col)] = self.particles[(row, col)] * prob_distr
+        proposta = collections.defaultdict(float)
+        
+        for linha, col in self.particles:
+            dist           =  math.sqrt((util.colToX(col) - agentX) ** 2 + (util.rowToY(linha) - agentY) ** 2)
+            dist_provavel  =  util.pdf(dist, Const.SONAR_STD, observedDist)
+            proposta[(linha, col)] = self.particles[(linha, col)] * dist_provavel
 
         newParticles = collections.defaultdict(int)
 
         for i in range(self.NUM_PARTICLES):
-            particle = util.weightedRandomChoice(proposed)
+            particle = util.weightedRandomChoice(proposta)
             newParticles[particle] += 1
 
         self.particles = newParticles
@@ -219,15 +219,16 @@ class ParticleFilter(object):
     # - You should NOT call self.updateBelief() at the end of this function.
     ##################################################################################
     def elapseTime(self):
-        
-        newParticles = collections.defaultdict(int)
-        for tile, value in self.particles.items():
-            if tile in self.transProbDict:
-                for _ in range(value):
-                    newWeightDict = self.transProbDict[tile]
-                    particle = util.weightedRandomChoice(newWeightDict)
-                    newParticles[particle] += 1
-        self.particles = newParticles
+
+        nova_particula = collections.defaultdict(int)
+        for pos, valor in self.particles.items():
+            if pos in self.transProbDict:
+                for _ in range(valor):
+                    novo_dict = self.transProbDict[pos]
+                    particula = util.weightedRandomChoice(novo_dict)
+                    nova_particula[particula] += 1
+
+        self.particles = nova_particula
         self.updateBelief()
 
     # Function: Get Belief
