@@ -59,9 +59,6 @@ poly = PolynomialFeatures(degree=degree1)
 x_train_poly = poly.fit_transform(x_train)
 x_test_poly = poly.transform(x_test)
 
-#y_train = poly.transform(y_train)
-#y_test = poly.transform(y_test)
-
 # Fazendo a predicao utilizando x_train e y_train
 reg = LinearRegression().fit(x_train_poly, y_train)
 
@@ -107,7 +104,7 @@ my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score com grau {degree2} = {my_r2_score}")
 
 my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
-print(f"MSE score com grau {degree2} = {my_mse_score}")
+print(f"MSE score com grau {degree2} = {my_mse_score}\n")
 
 # Plotting chart
 plt.scatter(x_train, y_train, c="orange", label = "Training Data")
@@ -118,8 +115,41 @@ plt.legend()
 plt.show()
 
 '''
-A princípio, o modelo parece não ter melhorado muito após o pré-processamento feito com PolynomialFeatures.
-O r2_score mudou pouco, assim como o MSE continua bem alto.
+Teste 3
+'''
+
+# Utilizando grau = 4 para o proximo teste
+degree3 = 4
+
+poly = PolynomialFeatures(degree3)
+x_train_poly = poly.fit_transform(x_train)
+x_test_poly  = poly.transform(x_test)
+
+# Fazendo a predicao utilizando x_train e y_train
+reg = LinearRegression().fit(x_train_poly, y_train)
+
+# Passando x_test para o modelo de regressao linear
+prediction = reg.predict(x_test_poly)
+
+print(f"Métricas utilizando degree = {degree3}:")
+
+my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
+print(f"R2 score com grau {degree3} = {my_r2_score}")
+
+my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
+print(f"MSE score com grau {degree3} = {my_mse_score}")
+
+# Plotting chart
+plt.scatter(x_train, y_train, c="orange", label = "Training Data")
+plt.scatter(x_test, y_test, c="green", label="Test data")
+plt.plot(x_test, prediction, c="red", label="Prediction")
+plt.plot(x_train, reg.predict(x_train_poly), c="blue", label="Train")
+plt.legend()
+plt.show()
+
+'''
+A princípio o modelo parece não ter melhorado muito após o pré-processamento feito com PolynomialFeatures.
+O r2_score e o MSE mudaram um pouco, mas ainda estão longe de valores bons.
 
 A minha hipótese é que talvez seja o formato da distribuição dos dados em ENGINESIZE que esteja causando isso, porque os dados estão MUITO mais 
 espalhados do que em outras variáveis do dataframe, o que indica que o número de outliers em ENGINESIZE deve ser muito alto. 
