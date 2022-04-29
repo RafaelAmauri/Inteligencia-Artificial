@@ -37,7 +37,9 @@ my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score utilizando só o modelo de regressão = {my_r2_score}")
 
 my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
-print(f"MSE score utilizando só o modelo de regressão = {my_mse_score}\n")
+print(f"MSE score utilizando só o modelo de regressão = {my_mse_score}")
+
+print("\n")
 
 # Plotting chart
 plt.scatter(x_train, y_train, c="orange", label = "Training Data")
@@ -71,7 +73,9 @@ my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score com grau {degree1} = {my_r2_score}")
 
 my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
-print(f"MSE score com grau {degree1} = {my_mse_score}\n")
+print(f"MSE score com grau {degree1} = {my_mse_score}")
+
+print("\n")
 
 # Plotting chart
 plt.scatter(x_train, y_train, c="orange", label = "Training Data")
@@ -104,7 +108,9 @@ my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score com grau {degree2} = {my_r2_score}")
 
 my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
-print(f"MSE score com grau {degree2} = {my_mse_score}\n")
+print(f"MSE score com grau {degree2} = {my_mse_score}")
+
+print("\n")
 
 # Plotting chart
 plt.scatter(x_train, y_train, c="orange", label = "Training Data")
