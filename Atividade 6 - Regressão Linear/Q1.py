@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-from sklearn.linear_model import LinearRegression
 import sklearn.metrics
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 df = pd.read_csv("FuelConsumptionCo2.csv")
 
@@ -33,30 +34,36 @@ FUELCONSUMPTION_CITY
 LETRA C
 '''
 
-# 80% Pra treino e 20% pra teste
-PERCENTAGE_TRAIN_DATA = 0.8
+# Ordenando de acordo com a variável
+df = df.sort_values(by="FUELCONSUMPTION_CITY")
 
-train_x = np.array(df["FUELCONSUMPTION_CITY"][ : int(PERCENTAGE_TRAIN_DATA*len(df["FUELCONSUMPTION_CITY"]))]).reshape(-1, 1)
-test_x  = np.array(df["FUELCONSUMPTION_CITY"][int(PERCENTAGE_TRAIN_DATA*len(df["FUELCONSUMPTION_CITY"])) + 1 :]).reshape(-1, 1)
+# 95% Pra treino e 5% pra teste
+PERCENTAGE_TRAIN_DATA = 0.95
 
-train_y = np.array(df["CO2EMISSIONS"][ : int(PERCENTAGE_TRAIN_DATA*len(df["CO2EMISSIONS"]))]).reshape(-1, 1)
-test_y  = np.array(df["CO2EMISSIONS"][int(PERCENTAGE_TRAIN_DATA*len(df["CO2EMISSIONS"])) + 1 :]).reshape(-1, 1)
+x_train, x_test = train_test_split(df["FUELCONSUMPTION_CITY"], train_size=PERCENTAGE_TRAIN_DATA, shuffle=False)
+y_train, y_test = train_test_split(df["CO2EMISSIONS"], train_size=PERCENTAGE_TRAIN_DATA, shuffle=False)
+
+x_train = x_train.to_numpy().reshape(-1, 1)
+x_test  = x_test.to_numpy().reshape(-1, 1)
+y_train = y_train.to_numpy().reshape(-1, 1)
+y_test  = y_test.to_numpy().reshape(-1, 1)
 
 # Fazendo a predicao utilizando train_x e train_y
-reg = LinearRegression().fit(train_x, train_y)
+reg = LinearRegression().fit(x_train, y_train)
 
 # Passando test_x para o modelo de regressao linear
-prediction = reg.predict(test_x)
+prediction = reg.predict(x_test)
 
-# Plotting chart
-plt.plot(test_y)
-plt.plot(prediction)
-
-plt.show()
-
-my_r2_score = sklearn.metrics.r2_score(test_y, prediction)
+my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score = {my_r2_score}")
 
-# Deu 429, mas pq? Os erros estao puxando muito pra cima?
-my_mse_score = sklearn.metrics.mean_squared_error(test_y, prediction)
+my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
 print(f"MSE score = {my_mse_score}")
+
+# Montando o grafico
+plt.scatter(x_train, y_train, c="orange", label = "Training Data")
+plt.scatter(x_test, y_test, c="green", label="Test data")
+plt.plot(x_test, prediction, c="red", label="Prediction")
+plt.plot(x_train, reg.predict(x_train), c="blue", label="Train")
+plt.legend()
+plt.show()

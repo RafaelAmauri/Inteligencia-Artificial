@@ -1,30 +1,51 @@
-from sklearn.preprocessing import PolynomialFeatures
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
 import sklearn.metrics
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
 
 df = pd.read_csv("FuelConsumptionCo2.csv")
 
-# 80% Pra treino e 20% pra teste de novo
-PERCENTAGE_TRAIN_DATA = 0.8
+# Ordenando de acordo com a variável
+df = df.sort_values(by="ENGINESIZE")
 
-train_x = np.array(df["ENGINESIZE"][ : int(PERCENTAGE_TRAIN_DATA*len(df["ENGINESIZE"]))]).reshape(-1, 1)
-test_x  = np.array(df["ENGINESIZE"][int(PERCENTAGE_TRAIN_DATA*len(df["ENGINESIZE"])) + 1 :]).reshape(-1, 1)
+# 95% Pra treino e 5% para teste
+PERCENTAGE_TRAIN_DATA = 0.95
 
-train_y = np.array(df["CO2EMISSIONS"][ : int(PERCENTAGE_TRAIN_DATA*len(df["CO2EMISSIONS"]))]).reshape(-1, 1)
-test_y  = np.array(df["CO2EMISSIONS"][int(PERCENTAGE_TRAIN_DATA*len(df["CO2EMISSIONS"])) + 1 :]).reshape(-1, 1)
+x_train, x_test = train_test_split(df["ENGINESIZE"], train_size=PERCENTAGE_TRAIN_DATA, shuffle=False)
+y_train, y_test = train_test_split(df["CO2EMISSIONS"], train_size=PERCENTAGE_TRAIN_DATA, shuffle=False)
+
+x_train = x_train.to_numpy().reshape(-1, 1)
+x_test  = x_test.to_numpy().reshape(-1, 1)
+y_train = y_train.to_numpy().reshape(-1, 1)
+y_test  = y_test.to_numpy().reshape(-1, 1)
 
 '''
-Teste mock sem utilizar PolynomialFeatures só pra ver o acerto do modelo normal
+Teste mock sem utilizar PolynomialFeatures só pra ver o acerto do modelo de regressao linear normal
 '''
 
-reg = LinearRegression().fit(train_x, train_y)
+reg = LinearRegression().fit(x_train, y_train)
 
-prediction = reg.predict(test_x)
+prediction = reg.predict(x_test)
 
-my_r2_score = sklearn.metrics.r2_score(test_y, prediction)
+print("Métricas da regressao linear normal:")
+
+my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score utilizando só o modelo de regressão = {my_r2_score}")
 
-my_mse_score = sklearn.metrics.mean_squared_error(test_y, prediction)
+my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
 print(f"MSE score utilizando só o modelo de regressão = {my_mse_score}\n")
+
+# Plotting chart
+plt.scatter(x_train, y_train, c="orange", label = "Training Data")
+plt.scatter(x_test, y_test, c="green", label="Test data")
+plt.plot(x_test, prediction, c="red", label="Prediction")
+plt.plot(x_train, reg.predict(x_train), c="blue", label="Train")
+plt.legend()
+plt.show()
 
 '''
 Primeiro teste com PolynomialFeatures
@@ -33,24 +54,35 @@ Primeiro teste com PolynomialFeatures
 # Utilizando grau = 2 para o primeiro teste
 degree1 = 2
 
-train_x_poly = PolynomialFeatures(degree1)
-train_x_poly = train_x_poly.fit_transform(train_x)
+poly = PolynomialFeatures(degree=degree1)
 
+x_train_poly = poly.fit_transform(x_train)
+x_test_poly = poly.transform(x_test)
 
-# Fazendo a predicao utilizando train_x e train_y
-reg = LinearRegression().fit(train_x_poly, train_y)
+#y_train = poly.transform(y_train)
+#y_test = poly.transform(y_test)
 
-test_x_poly = PolynomialFeatures(degree1)
-test_x_poly = test_x_poly.fit_transform(test_x)
+# Fazendo a predicao utilizando x_train e y_train
+reg = LinearRegression().fit(x_train_poly, y_train)
 
-# Passando test_x para o modelo de regressao linear
-prediction = reg.predict(test_x_poly)
+# Passando x_test para o modelo de regressao linear
+prediction = reg.predict(x_test_poly)
 
-my_r2_score = sklearn.metrics.r2_score(test_y, prediction)
+print(f"Métricas utilizando degree = {degree1}:")
+
+my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score com grau {degree1} = {my_r2_score}")
 
-my_mse_score = sklearn.metrics.mean_squared_error(test_y, prediction)
+my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
 print(f"MSE score com grau {degree1} = {my_mse_score}\n")
+
+# Plotting chart
+plt.scatter(x_train, y_train, c="orange", label = "Training Data")
+plt.scatter(x_test, y_test, c="green", label="Test data")
+plt.plot(x_test, prediction, c="red", label="Prediction")
+plt.plot(x_train, reg.predict(x_train_poly), c="blue", label="Train")
+plt.legend()
+plt.show()
 
 '''
 Teste 2
@@ -59,37 +91,38 @@ Teste 2
 # Utilizando grau = 3 para o proximo teste
 degree2 = 3
 
-train_x_poly = PolynomialFeatures(degree2)
-train_x_poly = train_x_poly.fit_transform(train_x)
+poly = PolynomialFeatures(degree2)
+x_train_poly = poly.fit_transform(x_train)
+x_test_poly  = poly.transform(x_test)
 
+# Fazendo a predicao utilizando x_train e y_train
+reg = LinearRegression().fit(x_train_poly, y_train)
 
-# Fazendo a predicao utilizando train_x e train_y
-reg = LinearRegression().fit(train_x_poly, train_y)
+# Passando x_test para o modelo de regressao linear
+prediction = reg.predict(x_test_poly)
 
-test_x_poly = PolynomialFeatures(degree2)
-test_x_poly = test_x_poly.fit_transform(test_x)
+print(f"Métricas utilizando degree = {degree2}:")
 
-# Passando test_x para o modelo de regressao linear
-prediction = reg.predict(test_x_poly)
-
-
-my_r2_score = sklearn.metrics.r2_score(test_y, prediction)
+my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
 print(f"R2 score com grau {degree2} = {my_r2_score}")
 
-my_mse_score = sklearn.metrics.mean_squared_error(test_y, prediction)
+my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
 print(f"MSE score com grau {degree2} = {my_mse_score}")
 
+# Plotting chart
+plt.scatter(x_train, y_train, c="orange", label = "Training Data")
+plt.scatter(x_test, y_test, c="green", label="Test data")
+plt.plot(x_test, prediction, c="red", label="Prediction")
+plt.plot(x_train, reg.predict(x_train_poly), c="blue", label="Train")
+plt.legend()
+plt.show()
+
 '''
-A princípio, o modelo parece não ter respondido muito bem ao pré-processamento feito com PolynomialFeatures.
+A princípio, o modelo parece não ter melhorado muito após o pré-processamento feito com PolynomialFeatures.
 O r2_score mudou pouco, assim como o MSE continua bem alto.
 
-Curiosamente, quando fiz os testes utilizando as variáveis FUELCONSUMPTION_CITY e FUELCONSUMPTION_COMB ao invés de ENGINESIZE,
-houve uma melhora muito alta! Um último teste também foi feito com a variável FUELCONSUMPTION_HWY, que na teoria tem uma correlação ainda menor que ENGINESIZE
-com CO2EMISSIONS, mas os resultados para ela também foram muito melhorados! A minha hipótese é que talvez seja o formato da distribuição dos dados em ENGINESIZE 
-que esteja causando isso, porque os dados estão MUITO mais espalhados do que nas outras variáveis que eu testei, o que indica que o número de outliers 
-em ENGINESIZE deve ser muito maior. Ao meu ver, não é uma fraqueza do modelo ou do pré-processamento, mas da variável ENGINESIZE que é
-uma péssima candidata para uma regressão linear :P
-
-Também testei com a variável CYLINDERS, que tem uma distribuição parecida com a de ENGINESIZE, e a melhora foi bem baixa, igual com ENGINESIZE.
-Isso me convenceu ainda mais de que o problema é com a variável escolhida para treinar o modelo, não com o modelo.
+A minha hipótese é que talvez seja o formato da distribuição dos dados em ENGINESIZE que esteja causando isso, porque os dados estão MUITO mais 
+espalhados do que em outras variáveis do dataframe, o que indica que o número de outliers em ENGINESIZE deve ser muito alto. 
+Ao meu ver, o resultado ruim não é uma fraqueza do modelo ou do pré-processamento, mas da variável ENGINESIZE que é uma péssima candidata para ser prevista, porque os dados
+nela estão muito espalhados para fazer uma previsão precisa utilizando esses modelos :P
 '''
