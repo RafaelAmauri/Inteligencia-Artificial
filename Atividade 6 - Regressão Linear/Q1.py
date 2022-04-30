@@ -52,18 +52,25 @@ y_test  = y_test.to_numpy().reshape(-1, 1)
 reg = LinearRegression().fit(x_train, y_train)
 
 # Passando test_x para o modelo de regressao linear
-prediction = reg.predict(x_test)
+prediction_test = reg.predict(x_test)
+prediction_training = reg.predict(x_train)
 
-my_r2_score = sklearn.metrics.r2_score(y_test, prediction)
-print(f"R2 score = {my_r2_score}")
+r2_score_training = sklearn.metrics.r2_score(y_train, prediction_training)
+print(f"R2 score in training = {r2_score_training}")
 
-my_mse_score = sklearn.metrics.mean_squared_error(y_test, prediction)
-print(f"MSE score = {my_mse_score}")
+mse_score_training = sklearn.metrics.mean_squared_error(y_train, prediction_training)
+print(f"MSE score in training = {mse_score_training}")
+
+r2_score_testing = sklearn.metrics.r2_score(y_test, prediction_test)
+print(f"R2 score in testing = {r2_score_testing}")
+
+mse_score_testing = sklearn.metrics.mean_squared_error(y_test, prediction_test)
+print(f"MSE score in testing = {mse_score_testing}")
 
 # Montando o grafico
 plt.scatter(x_train, y_train, c="orange", label = "Training Data")
 plt.scatter(x_test, y_test, c="green", label="Test data")
-plt.plot(x_test, prediction, c="red", label="Prediction")
-plt.plot(x_train, reg.predict(x_train), c="blue", label="Train")
+plt.plot(x_test, prediction_test, c="red", label="Prediction")
+plt.plot(x_train, prediction_training, c="blue", label="Train")
 plt.legend()
 plt.show()
