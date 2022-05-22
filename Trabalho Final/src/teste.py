@@ -1,5 +1,5 @@
 import pandas as pd
-
+'''
 # Lista de paises
 Paises = ["Brazil"]
 
@@ -14,3 +14,4 @@ csv_report = pd.read_csv('../assets/BR.csv')
 csv_report = csv_report[csv_report['Country Name'].isin(Paises)]
 
 print(csv_report)
+'''
