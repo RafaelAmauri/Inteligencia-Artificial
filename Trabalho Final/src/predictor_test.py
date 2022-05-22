@@ -1,7 +1,11 @@
 import predictor
 
-pred = predictor.TimeSeriesPredictor("../assets/BR.csv", ['SP.POP.TOTL', 'SP.RUR.TOTL'], 1960, 2004)
+pred = predictor.TimeSeriesPredictor()
 
-#pred.plot_indicators()
+pred.set_dataset_filepath("/home/rafael/PUC/PUC-Minas/Inteligencia-Artificial/Trabalho Final/assets/BR.csv")
+pred.set_indicators_codelist(['SP.POP.TOTL', 'SP.RUR.TOTL'])
+pred.set_percentage_train(75)
+pred.set_tseries_start_year(1960)
+pred.set_tseries_end_year(2014)
 
-pred.predict_indicators()
+pred.split_train_test('SP.POP.TOTL')
