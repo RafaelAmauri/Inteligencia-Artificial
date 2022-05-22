@@ -141,12 +141,12 @@ class TimeSeriesPredictor:
         tmp = df_row_indicator.loc[:, f"{self.get_tseries_start_year()}":f"{last_year_training}"]
 
         # Armazenando os valores 
-
-        ## !! Trocar os nomes, porque endog da funcao so recebe uma serie, não um par <value> e <predicted> !!
         self.__training_data   = np.concatenate(tmp.values, axis=0)
         self.__training_years  = np.asarray(tmp.keys())
 
-        tmp = df_row_indicator.loc[:, f"{last_year_training}":f"{self.get_tseries_end_year()}"]
+
+        tmp = df_row_indicator.loc[:, f"{last_year_training+1}":f"{self.get_tseries_end_year()}"]
+        #tmp = df_row_indicator.loc[:, f"{last_year_training}":f"{self.get_tseries_end_year()}"]
 
         self.__testing_data   = np.concatenate(tmp.values, axis=0)
         self.__testing_years  = np.asarray(tmp.keys())
