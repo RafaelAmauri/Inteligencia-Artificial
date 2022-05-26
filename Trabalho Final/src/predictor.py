@@ -2,6 +2,7 @@ import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
@@ -46,11 +47,11 @@ class TimeSeriesPredictor:
     def __init__(self):
         self.__model = ExponentialSmoothing
 
-        self.__training_data    = np.empty(0, dtype=np.float64)
-        self.__training_years   = np.empty(0, dtype=np.float64)
-        self.__testing_data     = np.empty(0, dtype=np.float64)
-        self.__testing_years    = np.empty(0, dtype=np.float64)
-        self.__predictions      = np.empty(0, dtype=np.float64)
+        self.__training_data    = np.empty(0, dtype=np.double)
+        self.__training_years   = np.empty(0, dtype=np.double)
+        self.__testing_data     = np.empty(0, dtype=np.double)
+        self.__testing_years    = np.empty(0, dtype=np.double)
+        self.__predictions      = np.empty(0, dtype=np.double)
 
         self.__runtime_metrics     = {}
         self.__indicators_namelist = {}
@@ -111,6 +112,13 @@ class TimeSeriesPredictor:
     def get_runtime_metrics(self):
         return self.__runtime_metrics
 
+    def clear_data(self):
+        self.__training_data    = np.empty(0, dtype=np.double)
+        self.__training_years   = np.empty(0, dtype=np.double)
+        self.__testing_data     = np.empty(0, dtype=np.double)
+        self.__testing_years    = np.empty(0, dtype=np.double)
+        self.__predictions      = np.empty(0, dtype=np.double)
+
 
 
     '''
@@ -118,8 +126,9 @@ class TimeSeriesPredictor:
     de acordo com self.__percentage_train
     '''
     def split_train_test(self, indicator_code):
-        self.__answers_test  = np.empty(0, dtype=np.int32)
-        self.__answers_train = np.empty(0, dtype=np.int32)
+        ## Zerando os arrays de novo, já que um novo split de dados e teste
+        ## significa que estamos avaliando outra métrica
+        self.clear_data()
 
         ## Início to cronômetro para separação
         start = time.perf_counter()
@@ -140,16 +149,14 @@ class TimeSeriesPredictor:
         ## ate o ultimo ano de treinamento
         tmp = df_row_indicator.loc[:, f"{self.get_tseries_start_year()}":f"{last_year_training}"]
 
-        # Armazenando os valores 
-        self.__training_data   = np.concatenate(tmp.values, axis=0)
-        self.__training_years  = np.asarray(tmp.keys())
+        # Armazenando os valores
+        self.__training_data   = np.asarray([float(x) for x in tmp.values[0]])
+        self.__training_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
 
+        tmp = df_row_indicator.loc[:, f"{last_year_training}":f"{self.get_tseries_end_year()}"]
 
-        tmp = df_row_indicator.loc[:, f"{last_year_training+1}":f"{self.get_tseries_end_year()}"]
-        #tmp = df_row_indicator.loc[:, f"{last_year_training}":f"{self.get_tseries_end_year()}"]
-
-        self.__testing_data   = np.concatenate(tmp.values, axis=0)
-        self.__testing_years  = np.asarray(tmp.keys())
+        self.__testing_data   = np.asarray([float(x) for x in tmp.values[0]])
+        self.__testing_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
 
         end   = time.perf_counter()
         self.set_runtime_metric("Separação dos dados de teste e treino", end - start)
@@ -163,9 +170,20 @@ class TimeSeriesPredictor:
         start = time.perf_counter()
 
         self.__model = ExponentialSmoothing(
+                                            ## Os valores observados na serie
                                             endog=self.get_training_data(),
-                                            initialization_method='estimated',
-                                            trend='add'
+
+                                            ## As datas referentes. É importante para o predict()
+                                            dates=self.get_training_years(),
+
+                                            ## O espacamento entre as datas. São anuais e começam no inicio de 
+                                            # cada ano, então usamos "AS". "AS" = Anual Start
+                                            freq="AS",
+
+                                            ##  
+                                            initialization_method="estimated",
+                                            # A série tem trend aditiva
+                                            trend="add"
                                             ).fit()
 
         end   = time.perf_counter()
@@ -179,7 +197,15 @@ class TimeSeriesPredictor:
     '''
     def predict_testing_data(self):
         start = time.perf_counter()
-        self.__predictions = self.__model.forecast(steps=len(self.get_testing_data()))
+
+        first_year, last_year = self.get_testing_years()[0], self.get_testing_years()[-1]
+
+        ## Obtendo os valores entre first_year e last_year
+        prediction = self.__model.predict(start=first_year, end=last_year)
+
+        ## Colocando no nosso array da classe
+        self.__predictions = np.append(self.__predictions, prediction)
+
         end   = time.perf_counter()
 
         self.set_runtime_metric("Predição dos próximos valores na série", end - start)
