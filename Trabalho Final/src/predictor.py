@@ -15,6 +15,10 @@ class TimeSeriesPredictor:
     ## Lista com codigo dos indicadores que serão avaliados
     __indicators_codelist: list
 
+    ## Lista para os nomes por extenso dos indicadores. É usado
+    ## para colocar o título nos gráficos usados no matplotlib
+    __indicators_namelist: dict 
+
     ## Arrays com os conjuntos de treino e teste, bem como as respostas preditas pelo modelo.
     ## *_data se refere aos valores observados na série. Essas são as variáveis mais importantes
     ## desse conjunto abaixo. *_years são os anos que foram usados nos períodos de teste e treino,
@@ -37,10 +41,6 @@ class TimeSeriesPredictor:
     ## Porcentagem de dados para treino de cada indicador
     __percentage_train: int
 
-    ## Lista para os nomes por extenso dos indicadores. É usado
-    ## para colocar o título nos gráficos usados no matplotlib
-    __indicators_namelist: dict 
-
 
     '''
     Instancia um preditor de series temporais
@@ -58,7 +58,9 @@ class TimeSeriesPredictor:
         self.__indicators_namelist = {}
         
 
-    ## Gets e Sets :)
+    '''
+    Gets e Sets :)
+    '''
     def set_tseries_start_year(self, start_year: int):
         self.__tseries_start_year = start_year
 
@@ -113,23 +115,12 @@ class TimeSeriesPredictor:
     def get_runtime_metrics(self):
         return self.__runtime_metrics
 
-    def clear_data(self):
-        self.__training_data    = np.empty(0, dtype=np.double)
-        self.__training_years   = np.empty(0, dtype=np.double)
-        self.__testing_data     = np.empty(0, dtype=np.double)
-        self.__testing_years    = np.empty(0, dtype=np.double)
-        self.__predictions      = np.empty(0, dtype=np.double)
-
-
 
     '''
     Essa função separa os valores para um indicador no dataset entre treino e teste 
     de acordo com self.__percentage_train
     '''
     def split_train_test(self, indicator_code):
-        ## Zerando os arrays de novo, já que um novo split de dados e teste
-        ## significa que estamos avaliando outra métrica
-        self.clear_data()
 
         ## Início to cronômetro para separação
         start = time.perf_counter()
@@ -181,7 +172,6 @@ class TimeSeriesPredictor:
                                             # cada ano, então usamos "AS". "AS" = Anual Start
                                             freq="AS",
 
-                                            ##  
                                             initialization_method="estimated",
                                             # A série tem trend aditiva
                                             trend="add"
@@ -201,11 +191,8 @@ class TimeSeriesPredictor:
 
         first_year, last_year = self.get_testing_years()[0], self.get_testing_years()[-1]
 
-        ## Obtendo os valores entre first_year e last_year
-        prediction = self.__model.predict(start=first_year, end=last_year)
-
-        ## Colocando no nosso array da classe
-        self.__predictions = np.append(self.__predictions, prediction)
+        ## Salvando os valores previstos entre os anos first_year e last_year
+        self.__predictions = self.__model.predict(start=first_year, end=last_year)
 
         end   = time.perf_counter()
 
