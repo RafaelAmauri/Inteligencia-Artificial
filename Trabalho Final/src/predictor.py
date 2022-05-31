@@ -138,15 +138,18 @@ class TimeSeriesPredictor:
         last_year_training = int((self.get_tseries_end_year() - self.get_tseries_start_year())*self.get_percentage_train() + self.get_tseries_start_year())
 
         ## Obtendo o conjunto de dados para treinamento. Esse conjunto vai desde o inicio da serie temporal
-        ## ate o ultimo ano de treinamento
+        ## ate o ultimo ano de treinamento.
         tmp = df_row_indicator.loc[:, f"{self.get_tseries_start_year()}":f"{last_year_training}"]
 
-        # Armazenando os valores
+        ## Armazenando os valores de treino
         self.__training_data   = np.asarray([float(x) for x in tmp.values[0]])
         self.__training_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
 
+        ## Obtendo agora o conjunto de dados de teste, que vai desde o ultimo ano de treino ate o fim
+        ## da série temporal.
         tmp = df_row_indicator.loc[:, f"{last_year_training}":f"{self.get_tseries_end_year()}"]
 
+        ## Armazenando os valores de teste
         self.__testing_data   = np.asarray([float(x) for x in tmp.values[0]])
         self.__testing_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
 
@@ -200,6 +203,11 @@ class TimeSeriesPredictor:
         self.set_runtime_metric("Predição dos próximos valores na série", end - start)
 
 
+    '''
+    Plota os gráficos com as linhas dos valores de treino, dos valores previstos 
+    e dos valores observados. É altamente recomendado chamar apenas essa função
+    e deixar ela orquestrar a chamada das outras.
+    '''
     def plot_indicators(self):
         start = time.perf_counter()
 
@@ -210,17 +218,20 @@ class TimeSeriesPredictor:
 
             indicator_name = self.get_indicators_namelist()[indicator_code]
 
-            print(f"Métricas para previsão de '{indicator_name}'")
+            print(f"Métricas de avaliação para a previsão de '{indicator_name}'")
 
             print(f"MAE Score = {mean_absolute_error(self.get_testing_data(), self.get_predictions())}")
             print(f"MSE Score = {mean_squared_error(self.get_testing_data(), self.get_predictions())}")
             print(f"R2 Score  = {r2_score(self.get_testing_data(), self.get_predictions())}", end="\n\n")
 
-            plt.title(f"{indicator_name}")
-            plt.plot(self.get_training_years(), self.get_training_data(), c="green", label="Treino")
-            plt.plot(self.get_testing_years(), self.get_testing_data(), c="blue", label="Teste")
-            plt.plot(self.get_testing_years(), self.get_predictions(), c="red", label="Previsão")
-            plt.legend()
+            plt.title(f"{indicator_name}", fontsize=18)
+            plt.plot(self.get_training_years(), self.get_training_data(), c="green", label="Treino", linewidth=2)
+            plt.plot(self.get_testing_years(), self.get_testing_data(), c="blue", label="Teste", linewidth=2)
+            plt.plot(self.get_testing_years(), self.get_predictions(), c="red", label="Previsão", linewidth=2)
+
+            plt.xticks(fontsize=14)
+            plt.yticks(fontsize=14)
+            plt.legend(fontsize=14)
             plt.show()
 
             plt.clf()
