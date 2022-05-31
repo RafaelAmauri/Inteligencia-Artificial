@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 class TimeSeriesPredictor:
@@ -208,9 +208,15 @@ class TimeSeriesPredictor:
             self.train_model()
             self.predict_testing_data()
 
-            print(r2_score(self.get_testing_data(), self.get_predictions()))
+            indicator_name = self.get_indicators_namelist()[indicator_code]
 
-            plt.title(f"{self.get_indicators_namelist()[indicator_code]}")
+            print(f"Métricas para previsão de '{indicator_name}'")
+
+            print(f"MAE Score = {mean_absolute_error(self.get_testing_data(), self.get_predictions())}")
+            print(f"MSE Score = {mean_squared_error(self.get_testing_data(), self.get_predictions())}")
+            print(f"R2 Score  = {r2_score(self.get_testing_data(), self.get_predictions())}", end="\n\n")
+
+            plt.title(f"{indicator_name}")
             plt.plot(self.get_training_years(), self.get_training_data(), c="green", label="Treino")
             plt.plot(self.get_testing_years(), self.get_testing_data(), c="blue", label="Teste")
             plt.plot(self.get_testing_years(), self.get_predictions(), c="red", label="Previsão")
@@ -218,8 +224,6 @@ class TimeSeriesPredictor:
             plt.show()
 
             plt.clf()
-
-        print(self.__indicators_namelist[indicator_code])
 
         end   = time.perf_counter()
         self.set_runtime_metric("Geração dos gráficos dos indicadores", end - start)
