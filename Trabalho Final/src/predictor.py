@@ -132,7 +132,7 @@ class TimeSeriesPredictor:
         df_row_indicator = df.loc[df['Indicator Code'] == indicator_code]
 
         ## Armazena o nome do indicador em uma lista para evitar ter que abrir várias vezes o CSV
-        self.__indicators_namelist[indicator_code] = df_row_indicator['Indicator Name']
+        self.__indicators_namelist[indicator_code] = df_row_indicator['Indicator Name'].values[0]
 
         ## Indica qual o ultimo ano para treinamento de acordo com a porcentagem de treino
         last_year_training = int((self.get_tseries_end_year() - self.get_tseries_start_year())*self.get_percentage_train() + self.get_tseries_start_year())
@@ -165,15 +165,16 @@ class TimeSeriesPredictor:
                                             ## Os valores observados na serie
                                             endog=self.get_training_data(),
 
-                                            ## As datas referentes. É importante para o predict()
+                                            ## As datas referentes ao treino. É importante para o predict() conseguir prever 
+                                            ## valores para anos específicos
                                             dates=self.get_training_years(),
 
-                                            ## O espacamento entre as datas. São anuais e começam no inicio de 
-                                            # cada ano, então usamos "AS". "AS" = Anual Start
+                                            ## O espaçamento entre as datas. Os dados são anuais e começam no inicio de 
+                                            ## cada ano, então usamos "AS". "AS" = Anual Start
                                             freq="AS",
 
                                             initialization_method="estimated",
-                                            # A série tem trend aditiva
+                                            ## A série tem uma trend aditiva
                                             trend="add"
                                             ).fit()
 
@@ -217,6 +218,8 @@ class TimeSeriesPredictor:
             plt.show()
 
             plt.clf()
+
+        print(self.__indicators_namelist[indicator_code])
 
         end   = time.perf_counter()
         self.set_runtime_metric("Geração dos gráficos dos indicadores", end - start)
