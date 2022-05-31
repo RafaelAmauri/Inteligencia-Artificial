@@ -179,7 +179,7 @@ class TimeSeriesPredictor:
                                             initialization_method="estimated",
                                             ## A série tem uma trend aditiva
                                             trend="add"
-                                            ).fit()
+                                            ).fit(smoothing_level=0.8)
 
         end   = time.perf_counter()
 
