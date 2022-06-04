@@ -150,7 +150,7 @@ class TimeSeriesPredictor:
         start = time.perf_counter()
 
         ## Abrindo o CSV
-        df = pd.read_csv(self.get_dataset_filepath(), sep=";")
+        df = pd.read_csv(self.get_dataset_filepath(), sep=",")
 
         ## Pega a coluna do dataset que tem as informações desse indicador
         df_row_indicator = df.loc[df['Indicator Code'] == indicator_code]
