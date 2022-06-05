@@ -15,9 +15,9 @@ class TimeSeriesPredictor:
     ## Lista com codigo dos indicadores que serão avaliados
     __indicators_codelist: list
 
-    ## Lista para os nomes por extenso dos indicadores. É usado
+    ## Dicionario para os nomes por extenso dos indicadores. É usado
     ## para colocar o título nos gráficos usados no matplotlib
-    __indicators_namelist: dict 
+    __indicators_namelist: dict
 
     ## Arrays com os conjuntos de treino e teste, bem como as respostas preditas pelo modelo.
     ## *_data se refere aos valores observados na série. Essas são as variáveis mais importantes
@@ -54,90 +54,149 @@ class TimeSeriesPredictor:
     def __init__(self):
         self.__model = ExponentialSmoothing
 
-        self.__training_data    = np.empty(0, dtype=np.double)
-        self.__training_years   = np.empty(0, dtype=np.double)
-        self.__validation_data  = np.empty(0, dtype=np.double)
-        self.__validation_years = np.empty(0, dtype=np.double)
-        self.__testing_data     = np.empty(0, dtype=np.double)
-        self.__testing_years    = np.empty(0, dtype=np.double)
-        self.__predictions_testing    = np.empty(0, dtype=np.double)
-        self.__predictions_validation = np.empty(0, dtype=np.double)
+        self.training_data    = np.empty(0, dtype=np.double)
+        self.training_years   = np.empty(0, dtype=np.double)
+        self.validation_data  = np.empty(0, dtype=np.double)
+        self.validation_years = np.empty(0, dtype=np.double)
+        self.testing_data     = np.empty(0, dtype=np.double)
+        self.testing_years    = np.empty(0, dtype=np.double)
+        self.predictions_testing    = np.empty(0, dtype=np.double)
+        self.predictions_validation = np.empty(0, dtype=np.double)
 
-        self.__runtime_metrics     = {}
-        self.__indicators_namelist = {}
+        self.indicators_namelist = {}
         
 
     '''
     Gets e Sets :)
     '''
-    def set_tseries_start_year(self, start_year: int):
-        self.__tseries_start_year = start_year
-
-    def get_tseries_start_year(self):
+    @property
+    def tseries_start_year(self) -> int:
         return self.__tseries_start_year
+
+    @tseries_start_year.setter
+    def tseries_start_year(self, start_year: int):
+        self.__tseries_start_year = start_year
         
-    def set_tseries_end_year(self, end_year: int):
-        self.__tseries_end_year = end_year
-
-    def get_tseries_end_year(self):
+    @property
+    def tseries_end_year(self) -> int:
         return self.__tseries_end_year
-
-    def set_indicators_codelist(self, indicators_codelist):
-        self.__indicators_codelist = indicators_codelist
-
-    def get_indicators_codelist(self):
+    
+    @tseries_end_year.setter
+    def tseries_end_year(self, end_year: int):
+        self.__tseries_end_year = end_year
+    
+    @property
+    def indicators_codelist(self) -> list:
         return self.__indicators_codelist
 
-    def set_percentage_train(self, percentage: int):
-        self.__percentage_train = percentage/100
-    
-    def get_percentage_train(self):
-        return self.__percentage_train
+    @indicators_codelist.setter
+    def indicators_codelist(self, indicators_codelist: list):
+        self.__indicators_codelist = indicators_codelist
 
-    def set_percentage_validation(self, percentage: int):
-        self.__percentage_validation = percentage/100
-
-    def get_percentage_validation(self):
-        return self.__percentage_validation
-
-    def set_dataset_filepath(self, filepath: str):
-        self.__dataset_filepath = filepath
-
-    def get_dataset_filepath(self):
-        return self.__dataset_filepath
-
-    def get_training_data(self):
-        return self.__training_data
-
-    def get_training_years(self):
-        return self.__training_years
-
-    def get_validation_data(self):
-        return self.__validation_data
-    
-    def get_validation_years(self):
-        return self.__validation_years
-
-    def get_testing_data(self):
-        return self.__testing_data
-
-    def get_testing_years(self):
-        return self.__testing_years
-
-    def get_predictions_testing(self):
-        return self.__predictions_testing
-
-    def get_predictions_validation(self):
-        return self.__predictions_validation
-
-    def get_indicators_namelist(self):
+    @property
+    def indicators_namelist(self) -> dict:
         return self.__indicators_namelist
 
-    def set_runtime_metric(self, metric_name: str, measured_time: float):
-        self.__runtime_metrics[metric_name] = f"{measured_time:.6f} s"
+    @indicators_namelist.setter
+    def indicators_namelist(self, pair_code_name: tuple):
+        if len(pair_code_name) == 0:
+            self.__indicators_namelist = pair_code_name
+
+        else:
+            try:
+                code, name = pair_code_name
+            except ValueError:
+                raise ValueError("Pass an iterable with two items")
+            
+            self.__indicators_namelist[code] = name
+
+    @property
+    def percentage_train(self) -> float:
+        return self.__percentage_train
+
+    @percentage_train.setter
+    def percentage_train(self, percentage: int):
+        self.__percentage_train = percentage/100
     
-    def get_runtime_metrics(self):
-        return self.__runtime_metrics
+    @property
+    def percentage_validation(self) -> float:
+        return self.__percentage_validation
+
+    @percentage_validation.setter
+    def percentage_validation(self, percentage: int):
+        self.__percentage_validation = percentage/100
+
+    @property
+    def dataset_filepath(self) -> str:
+        return self.__dataset_filepath
+
+    @dataset_filepath.setter
+    def dataset_filepath(self, filepath: str):
+        self.__dataset_filepath = filepath
+
+    @property
+    def training_data(self):
+        return self.__training_data
+
+    @training_data.setter
+    def training_data(self, data):
+        self.__training_data = data
+
+    @property
+    def training_years(self):
+        return self.__training_years
+
+    @training_years.setter
+    def training_years(self, years):
+        self.__training_years = years
+
+    @property
+    def validation_data(self):
+        return self.__validation_data
+    
+    @validation_data.setter
+    def validation_data(self, data):
+        self.__validation_data = data
+
+    @property
+    def validation_years(self):
+        return self.__validation_years
+
+    @validation_years.setter
+    def validation_years(self, years):
+        self.__validation_years = years
+
+    @property
+    def testing_data(self):
+        return self.__testing_data
+
+    @testing_data.setter
+    def testing_data(self, data):
+        self.__testing_data = data
+
+    @property
+    def testing_years(self):
+        return self.__testing_years
+
+    @testing_years.setter
+    def testing_years(self, years):
+        self.__testing_years = years
+
+    @property
+    def predictions_testing(self):
+        return self.__predictions_testing
+
+    @predictions_testing.setter
+    def predictions_testing(self, predictions):
+        self.__predictions_testing = predictions
+
+    @property
+    def predictions_validation(self):
+        return self.__predictions_validation
+
+    @predictions_validation.setter
+    def predictions_validation(self, predictions):
+        self.__predictions_validation = predictions
 
 
     '''
@@ -146,62 +205,54 @@ class TimeSeriesPredictor:
     '''
     def split_train_test_val(self, indicator_code):
 
-        ## Início to cronômetro para separação
-        start = time.perf_counter()
-
         ## Abrindo o CSV
-        df = pd.read_csv(self.get_dataset_filepath(), sep=",")
+        df = pd.read_csv(self.dataset_filepath, sep=",")
 
         ## Pega a coluna do dataset que tem as informações desse indicador
         df_row_indicator = df.loc[df['Indicator Code'] == indicator_code]
 
         ## Armazena o nome do indicador em uma lista para evitar ter que abrir várias vezes o CSV
-        self.__indicators_namelist[indicator_code] = df_row_indicator['Indicator Name'].values[0]
+        self.indicators_namelist = (indicator_code, df_row_indicator['Indicator Name'].values[0])
 
         ## Indica qual o ultimo ano para treinamento de acordo com a porcentagem de treino
-        last_year_training = int((self.get_tseries_end_year() - self.get_tseries_start_year())*self.get_percentage_train() + self.get_tseries_start_year())
+        last_year_training = int((self.tseries_end_year - self.tseries_start_year)*self.percentage_train + self.tseries_start_year)
         
         ## Obtendo o conjunto de dados para treinamento. Esse conjunto vai desde o inicio da serie temporal
         ## ate o ultimo ano de treinamento.
-        tmp = df_row_indicator.loc[:, f"{self.get_tseries_start_year()}":f"{last_year_training}"]
+        tmp = df_row_indicator.loc[:, f"{self.tseries_start_year}":f"{last_year_training}"]
 
         ## Armazenando os valores de treino
-        self.__training_data   = np.asarray([float(x) for x in tmp.values[0]])
-        self.__training_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
+        self.training_data   = np.asarray([float(x) for x in tmp.values[0]])
+        self.training_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
 
-        last_year_validation = int((self.get_tseries_end_year() - self.get_tseries_start_year())*self.get_percentage_validation() + last_year_training)
+        last_year_validation = int((self.tseries_end_year - self.tseries_start_year)*self.percentage_validation + last_year_training)
         tmp = df_row_indicator.loc[:, f"{last_year_training}":f"{last_year_validation}"]
 
         ## Obtendo o conjunto de dados de validação
-        self.__validation_data   = np.asarray([float(x) for x in tmp.values[0]])
-        self.__validation_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
+        self.validation_data   = np.asarray([float(x) for x in tmp.values[0]])
+        self.validation_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
 
         ## Obtendo agora o conjunto de dados de teste, que vai desde o ultimo ano de treino ate o fim
         ## da série temporal.
-        tmp = df_row_indicator.loc[:, f"{last_year_validation}":f"{self.get_tseries_end_year()}"]
+        tmp = df_row_indicator.loc[:, f"{last_year_validation}":f"{self.tseries_end_year}"]
 
         ## Armazenando os valores de teste
-        self.__testing_data   = np.asarray([float(x) for x in tmp.values[0]])
-        self.__testing_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
-
-        end   = time.perf_counter()
-        self.set_runtime_metric("Separação dos dados de teste e treino", end - start)
+        self.testing_data   = np.asarray([float(x) for x in tmp.values[0]])
+        self.testing_years  = np.asarray([datetime(int(x), 1, 1) for x in tmp.keys()])
         
 
     '''
-    Treina o modelo com os dados em self.get_training_data(). Deve ser chamada
+    Treina o modelo com os dados em self.training_data. Deve ser chamada
     somente depois de self.split_train_test_val()
     '''
     def train_model(self):
-        start = time.perf_counter()
-
         self.__model = ExponentialSmoothing(
                                             ## Os valores observados na serie
-                                            endog=self.get_training_data(),
+                                            endog=self.training_data,
 
                                             ## As datas referentes ao treino. É importante para o predict() conseguir prever 
                                             ## valores para anos específicos
-                                            dates=self.get_training_years(),
+                                            dates=self.training_years,
 
                                             ## O espaçamento entre as datas. Os dados são anuais e começam no inicio de 
                                             ## cada ano, então usamos "AS". "AS" = Anual Start
@@ -212,10 +263,6 @@ class TimeSeriesPredictor:
                                             trend="add"
                                             ).fit(smoothing_level=0.8)
 
-        end   = time.perf_counter()
-
-        self.set_runtime_metric("Etapa de treinamento do modelo", end-start)
-
 
     '''
     Faz a previsão dos dados no conjunto de validação. Essa função deve ser chamada
@@ -223,19 +270,13 @@ class TimeSeriesPredictor:
     Os dados de validação são usados para ajuste dos parâmetros do modelo
     '''
     def predict_validation_data(self):
-        start = time.perf_counter()
-
-        first_year, last_year = self.get_validation_years()[0], self.get_validation_years()[-1]
+        first_year, last_year = self.validation_years[0], self.validation_years[-1]
 
         ## Salvando os valores previstos entre os anos first_year e last_year
-        self.__predictions_validation = self.__model.predict(start=first_year, end=last_year)
+        self.predictions_validation = self.__model.predict(start=first_year, end=last_year)
 
-        print(f"MAE Score na validação = {mean_absolute_error(self.get_validation_data(), self.get_predictions_validation())}")
-        print(f"R2 Score na validação  = {r2_score(self.get_validation_data(), self.get_predictions_validation())}", end="\n\n")
-
-        end   = time.perf_counter()
-
-        self.set_runtime_metric("Predição dos próximos valores na série", end - start)
+        print(f"MAE Score na validação = {mean_absolute_error(self.validation_data, self.predictions_validation)}")
+        print(f"R2 Score na validação  = {r2_score(self.validation_data, self.predictions_validation)}", end="\n\n")
 
 
     '''
@@ -243,16 +284,10 @@ class TimeSeriesPredictor:
     somente depois de self.split_train_test_val() e de self.train_model()
     '''
     def predict_testing_data(self):
-        start = time.perf_counter()
-
-        first_year, last_year = self.get_testing_years()[0], self.get_testing_years()[-1]
+        first_year, last_year = self.testing_years[0], self.testing_years[-1]
 
         ## Salvando os valores previstos entre os anos first_year e last_year
-        self.__predictions_testing = self.__model.predict(start=first_year, end=last_year)
-
-        end   = time.perf_counter()
-
-        self.set_runtime_metric("Predição dos próximos valores na série", end - start)
+        self.predictions_testing = self.__model.predict(start=first_year, end=last_year)
 
 
     '''
@@ -261,25 +296,23 @@ class TimeSeriesPredictor:
     e deixar ela orquestrar a chamada das outras.
     '''
     def plot_indicators(self):
-        start = time.perf_counter()
-
-        for indicator_code in self.get_indicators_codelist():
+        for indicator_code in self.indicators_codelist:
             self.split_train_test_val(indicator_code)
             self.train_model()
             self.predict_testing_data()
 
-            indicator_name = self.get_indicators_namelist()[indicator_code]
+            indicator_name = self.indicators_namelist[indicator_code]
 
             print(f"Métricas de avaliação para a previsão de '{indicator_name}'")
 
-            print(f"MAE Score no teste = {mean_absolute_error(self.get_testing_data(), self.get_predictions_testing())}")
-            print(f"R2 Score no teste  = {r2_score(self.get_testing_data(), self.get_predictions_testing())}", end="\n\n")
+            print(f"MAE Score no teste = {mean_absolute_error(self.testing_data, self.predictions_testing)}")
+            print(f"R2 Score no teste  = {r2_score(self.testing_data, self.predictions_testing)}", end="\n\n")
 
             plt.title(f"{indicator_name}", fontsize=18)
-            plt.plot(self.get_training_years(), self.get_training_data(), c="green", label="Treino", linewidth=2.5)
-            plt.plot(self.get_validation_years(), self.get_validation_data(), c="darkorange", label="Validação", linewidth=2.5)
-            plt.plot(self.get_testing_years(), self.get_testing_data(), c="blue", label="Teste", linewidth=2.5)
-            plt.plot(self.get_testing_years(), self.get_predictions_testing(), c="red", label="Previsão", linewidth=2.5)
+            plt.plot(self.training_years, self.training_data, c="green", label="Treino", linewidth=2.5)
+            plt.plot(self.validation_years, self.validation_data, c="darkorange", label="Validação", linewidth=2.5)
+            plt.plot(self.testing_years, self.testing_data, c="blue", label="Teste", linewidth=2.5)
+            plt.plot(self.testing_years, self.predictions_testing, c="red", label="Previsão", linewidth=2.5)
 
             plt.xticks(fontsize=14)
             plt.yticks(fontsize=14)
@@ -287,6 +320,3 @@ class TimeSeriesPredictor:
             plt.show()
 
             plt.clf()
-
-        end   = time.perf_counter()
-        self.set_runtime_metric("Geração dos gráficos dos indicadores", end - start)
