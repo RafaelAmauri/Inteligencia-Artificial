@@ -2,7 +2,7 @@ import predictor
 
 pred = predictor.TimeSeriesPredictor()
 
-pred.dataset_filepath = "/home/rafael/PUC/PUC-Minas/Inteligencia-Artificial/Trabalho Final/assets/BR.csv"
+pred.dataset_filepath = "./assets/BR.csv"
 pred.indicators_codelist = ['SP.POP.TOTL', 'SP.RUR.TOTL.ZS', 'SP.URB.TOTL.IN.ZS']
 
 pred.percentage_train = 83
