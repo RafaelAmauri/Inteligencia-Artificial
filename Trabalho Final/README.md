@@ -4,7 +4,7 @@ Desenvolvedores:
 
 [Lucas Santiago](https://github.com/LucasSnatiago "Lucas Santiago")
 
-Rafael Amauri (eu :D)
+Rafael Amauri (Eu :D)
 
 [Thiago Henriques](https://github.com/ThiagoHN "Thiago Henriques")
 
@@ -28,7 +28,7 @@ python3 main.py
 
 ## Dica de utilização
 
-Tenha em mente que esse arquivo só executa algumas das várias funções que foram implementadas para o classificador. Se tiver interesse, veja o código-fonte dele em src/classifier.py
+Tenha em mente que a main.py só executa algumas das várias funções que foram implementadas para o classificador. Se tiver interesse, veja abaixo algumas das principais funções usadas.
 
 ### Essenciais:
 
@@ -55,7 +55,9 @@ Tenha em mente que esse arquivo só executa algumas das várias funções que fo
     predictor.plot_indicators()      -> Faz as operações de separar os dados de acordo com as porcentagens, treina
                                         o modelo para cada indicador, faz as previsões, printa os valores para as
                                         métricas de avaliação para a previsão e retorna uma imagem do plot dos valores
-                                        de treino, validação e teste para cada indicador na sua tela.
+                                        de treino, validação e teste para cada indicador na sua tela. É altamente recomendado
+                                        que se deixe essa função aqui orquestrar tudo e chamar as outras, basta só definir os
+                                        valores para todos atributos acima e chamar predictor.plot_indicators() que ela já faz tudo!
 ### Debug:
     @property
     predictor.training_years    -> Retorna os anos que serão usados para treino.
