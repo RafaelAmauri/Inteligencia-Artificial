@@ -13,8 +13,7 @@ O programa foi feito para ser utilizado no Linux. Embora alguns testes mostraram
 o grupo não teve interesse nem incentivo para dar suporte à versão Windows. É fortemente recomendado utilizar no Linux!
 
 ## Como utilizar ?
-Primeiramente, é necessário que você tenha acesso às imagens disponibilizadas na disciplina. Infelizmente não podemos redistribuir elas aqui, então você precisa ter elas de antemão.
-Com a posse das imagens em mão, para instalar as dependências do programa basta rodar:
+Para instalar as dependências do programa basta rodar:
 
 ```
 pip3 install -r requirements.txt
