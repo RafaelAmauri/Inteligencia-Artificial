@@ -4,7 +4,7 @@ Desenvolvedores:
 
 [Lucas Santiago](https://github.com/LucasSnatiago "Lucas Santiago")
 
-Rafael Amauri (Eu :D)
+Rafael Amauri(Eu :D)
 
 [Thiago Henriques](https://github.com/ThiagoHN "Thiago Henriques")
 
@@ -13,6 +13,10 @@ O programa foi feito para ser utilizado no Linux. Embora alguns testes mostraram
 o grupo não teve interesse nem incentivo para dar suporte à versão Windows. É fortemente recomendado utilizar no Linux!
 
 ## Como utilizar ?
+
+O dataset já vem incluso no repositório, mas caso tenha algum problema e ele se corromper ou tiver outro problema, o dataset pode ser
+baixado diretamente do website do Banco Mundial por meio do link https://datacatalog.worldbank.org/search/dataset/0037652/Health%20Nutrition%20and%20Population%20Statistics
+
 Para instalar as dependências do programa basta rodar:
 
 ```
